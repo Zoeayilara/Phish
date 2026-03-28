@@ -1,7 +1,6 @@
 [build]
-  base = ""
-  command = "cd phishguard && python manage.py collectstatic --noinput && python manage.py migrate"
-  publish = "phishguard/staticfiles/"
+  command = "python manage.py collectstatic --noinput && python manage.py migrate"
+  publish = "staticfiles/"
 
 [build.environment]
   PYTHON_VERSION = "3.9"
