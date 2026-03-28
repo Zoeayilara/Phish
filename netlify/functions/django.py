@@ -16,6 +16,9 @@ from django.core.wsgi import get_wsgi_application
 from django.http import JsonResponse
 
 def handler(event, context):
+    print("Django Netlify function invoked!")
+    print(f"Event: {event}")
+    print(f"Context: {context}")
     """
     Netlify function handler for Django
     """
