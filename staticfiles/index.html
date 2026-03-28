@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard AI - Phishing Detection System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+        .api-test {
+            margin-top: 30px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ PhishGuard AI</h1>
+        <p style="font-size: 1.3em;">Multi-Modal Deep Learning for Email Phishing Detection</p>
+        
+        <div class="status">
+            <strong>✅ Static Site Deployed Successfully!</strong><br>
+            Django backend is configured but requires server-side rendering.
+        </div>
+        
+        <div class="api-test">
+            <h3>Test API Endpoint</h3>
+            <button onclick="testAPI()">Test Phishing Detection API</button>
+            <div id="api-result"></div>
+        </div>
+        
+        <div style="margin-top: 40px; font-size: 0.9em;">
+            <p><strong>Note:</strong> This is a static deployment of PhishGuard AI.</p>
+            <p>For full Django functionality, consider deploying to:</p>
+            <ul style="list-style: none; padding: 0;">
+                <li>• Vercel (recommended for Django)</li>
+                <li>• Heroku</li>
+                <li>• PythonAnywhere</li>
+                <li>• DigitalOcean App Platform</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<p>Testing API...</p>';
+            
+            try {
+                const response = await fetch('/api/scan/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sender: 'test@suspicious.xyz',
+                        subject: 'Verify your account',
+                        body: 'Click here to verify immediately'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<p><strong>API Response:</strong><br>${JSON.stringify(data, null, 2)}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #ff6b6b;">API Error: ${response.status}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: #ff6b6b;">Network Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
