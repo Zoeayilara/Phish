@@ -1,0 +1,61 @@
+{% extends 'detector/base.html' %}
+{% block title %}Inbox Scan{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <div class="panel-head">
+    <div class="panel-title">Inbox — all scanned emails</div>
+    <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">{{ total_count }} result{{ total_count|pluralize }}</span>
+  </div>
+  <div class="toolbar">
+    <form method="get" style="display:flex;gap:8px;flex:1">
+      <input class="search-box" name="q" value="{{ search }}" placeholder="Search sender or subject..." autocomplete="off">
+      <input type="hidden" name="status" value="{{ status_filter }}">
+      <button type="submit" class="btn btn-outline btn-sm">Search</button>
+    </form>
+    <a href="?status=all" class="filter-tab {% if status_filter == 'all' %}active{% endif %}">All</a>
+    <a href="?status=phishing" class="filter-tab {% if status_filter == 'phishing' %}active{% endif %}">Phishing</a>
+    <a href="?status=suspicious" class="filter-tab susp {% if status_filter == 'suspicious' %}active{% endif %}">Suspicious</a>
+    <a href="?status=safe" class="filter-tab safe {% if status_filter == 'safe' %}active{% endif %}">Safe</a>
+  </div>
+  {% if emails %}
+  <table class="etable">
+    <thead><tr><th>Sender</th><th>Subject</th><th>Risk score</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for e in emails %}
+    <tr onclick="location.href='/email/{{ e.pk }}/'">
+      <td>
+        <div style="color:var(--text);font-weight:500;font-size:12px">{{ e.sender_domain }}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">{{ e.sender|truncatechars:38 }}</div>
+      </td>
+      <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        {% if not e.is_read %}<span style="display:inline-block;width:6px;height:6px;background:var(--blue);border-radius:50%;margin-right:6px;vertical-align:middle"></span>{% endif %}
+        {{ e.subject|truncatechars:55 }}
+      </td>
+      <td>
+        <div class="risk-wrap">
+          <div class="risk-bar"><div class="risk-fill" style="width:{{ e.risk_percent }}%;background:{% if e.status == 'phishing' %}var(--red){% elif e.status == 'suspicious' %}var(--amber){% else %}var(--green){% endif %}"></div></div>
+          <span class="risk-num" style="color:{% if e.status == 'phishing' %}var(--red){% elif e.status == 'suspicious' %}var(--amber){% else %}var(--green){% endif %}">{{ e.risk_percent }}%</span>
+        </div>
+      </td>
+      <td>
+        {% if e.status == 'phishing' %}<span class="tag tag-phish">PHISHING</span>
+        {% elif e.status == 'suspicious' %}<span class="tag tag-susp">SUSPICIOUS</span>
+        {% elif e.status == 'safe' %}<span class="tag tag-safe">SAFE</span>
+        {% else %}<span class="tag tag-pend">PENDING</span>{% endif %}
+      </td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">{{ e.received_at|date:"M d, H:i" }}</td>
+      <td><a href="/email/{{ e.pk }}/" class="btn btn-outline btn-sm" onclick="event.stopPropagation()">View</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="padding:48px;text-align:center;color:var(--text3)">
+    <div style="font-size:24px;margin-bottom:12px">📭</div>
+    <div style="font-size:14px">No emails found.</div>
+    <a href="/scan/" class="btn btn-primary" style="margin-top:16px;display:inline-flex">Scan an email</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

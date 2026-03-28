@@ -1,0 +1,45 @@
+{% extends 'detector/base.html' %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div style="max-width:560px">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:20px">Settings</h1>
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head"><div class="panel-title">Detection sensitivity</div></div>
+    <div class="panel-body">
+      <div style="margin-bottom:20px">
+        <div class="form-label">Phishing threshold</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" min="50" max="90" value="65" id="thresh"
+            style="flex:1;accent-color:var(--red)"
+            oninput="document.getElementById('thresh-val').textContent=this.value+'%'">
+          <span id="thresh-val" style="font-family:var(--mono);font-size:13px;color:var(--red);min-width:38px">65%</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">emails above this score are classified as phishing</div>
+      </div>
+      <div>
+        <div class="form-label">Alert mode</div>
+        <div style="display:flex;gap:8px">
+          <button class="filter-tab active">Real-time</button>
+          <button class="filter-tab">Digest</button>
+          <button class="filter-tab">Silent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div class="panel-title">Active modalities</div></div>
+    <div class="panel-body">
+      {% for mod in modalities %}
+      <label style="display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:pointer;font-size:13px;color:var(--text2)">
+        <input type="checkbox" checked style="accent-color:var(--red)"> {{ mod }}
+      </label>
+      {% empty %}
+      <label style="display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" checked style="accent-color:var(--red)"> Text embedding analysis</label>
+      <label style="display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" checked style="accent-color:var(--red)"> URL feature extraction</label>
+      <label style="display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" checked style="accent-color:var(--red)"> Sender metadata scoring</label>
+      <label style="display:flex;align-items:center;gap:12px;margin-bottom:0;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" checked style="accent-color:var(--red)"> Attachment scanning</label>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

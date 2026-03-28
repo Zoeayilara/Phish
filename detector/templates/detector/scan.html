@@ -1,0 +1,93 @@
+{% extends 'detector/base.html' %}
+{% block title %}Scan Email{% endblock %}
+{% block content %}
+<div style="max-width:700px">
+  <div style="margin-bottom:24px">
+    <h1 style="font-size:20px;font-weight:700;margin-bottom:6px">Scan an Email</h1>
+    <p style="color:var(--text2);font-size:13px">Paste email details below. The multi-modal AI engine will analyse text, URLs, sender metadata and attachments.</p>
+  </div>
+
+  {% if error %}
+  <div class="msg msg-error" style="margin-bottom:16px">{{ error }}</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="panel">
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="form-label">Sender email *</label>
+          <input class="form-input" type="email" name="sender" placeholder="e.g. noreply@suspicious-domain.xyz" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject *</label>
+          <input class="form-input" type="text" name="subject" placeholder="e.g. Urgent: verify your account" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email body *</label>
+          <textarea class="form-textarea" name="body" placeholder="Paste the full email content here..." required style="min-height:160px"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Attachment filename (optional)</label>
+          <input class="form-input" type="text" name="attachment_name" placeholder="e.g. invoice.exe or document.pdf">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="white"><circle cx="8" cy="8" r="6" fill="none" stroke="white" stroke-width="1.5"/><path d="M8 5v4M8 11v1" stroke="white" stroke-width="1.5" fill="none"/></svg>
+          Run AI Analysis
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="panel" style="margin-top:16px">
+    <div class="panel-head"><div class="panel-title">Quick test samples</div></div>
+    <div class="panel-body">
+      <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Click a sample to auto-fill the form:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="fillSample('phish')" class="btn btn-outline" style="justify-content:flex-start;text-align:left">
+          <span class="tag tag-phish" style="flex-shrink:0">PHISHING</span>
+          PayPal account verification scam
+        </button>
+        <button onclick="fillSample('susp')" class="btn btn-outline" style="justify-content:flex-start;text-align:left">
+          <span class="tag tag-susp" style="flex-shrink:0">SUSPICIOUS</span>
+          Job offer with unusual request
+        </button>
+        <button onclick="fillSample('safe')" class="btn btn-outline" style="justify-content:flex-start;text-align:left">
+          <span class="tag tag-safe" style="flex-shrink:0">SAFE</span>
+          Legitimate meeting follow-up
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const samples = {
+  phish: {
+    sender: 'security-alert@paypa1-support.net',
+    subject: 'URGENT: Your PayPal account has been limited',
+    body: 'Dear Customer,\n\nWe have detected suspicious activity on your PayPal account. Your account has been limited.\n\nPlease click the link below to verify your identity within 24 hours or your account will be permanently suspended.\n\nVerify now: http://paypa1-support.net/verify?token=a8f3kx29\n\nFailure to act may result in permanent account closure.\n\n— PayPal Security Team',
+    attach: ''
+  },
+  susp: {
+    sender: 'hr@globalopportunities2026.org',
+    subject: 'Congratulations — you have been selected for a remote job',
+    body: 'Dear Applicant,\n\nAfter reviewing your profile, we are pleased to offer you a remote work position at our company. The salary is $5,000/month. To proceed, please provide your bank account details for payroll setup.\n\nKindly respond within 48 hours.\n\nGlobal Opportunities HR Team',
+    attach: 'offer_letter.pdf'
+  },
+  safe: {
+    sender: 'john.okafor@gmail.com',
+    subject: 'Meeting notes from yesterday',
+    body: 'Hi team,\n\nPlease find attached the notes from our project sync yesterday. Let me know if I missed anything important.\n\nBest regards,\nJohn',
+    attach: 'meeting-notes.pdf'
+  }
+};
+function fillSample(type) {
+  const s = samples[type];
+  document.querySelector('[name=sender]').value = s.sender;
+  document.querySelector('[name=subject]').value = s.subject;
+  document.querySelector('[name=body]').value = s.body;
+  document.querySelector('[name=attachment_name]').value = s.attach;
+}
+</script>
+{% endblock %}

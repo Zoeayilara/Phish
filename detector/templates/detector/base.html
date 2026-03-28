@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhishGuard AI — {% block title %}Dashboard{% endblock %}</title>
+{% load static %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c10;--bg2:#111318;--bg3:#161920;--border:#1e2128;--border2:#252830;
+  --red:#ff4444;--red2:rgba(255,68,68,.12);--amber:#f59e0b;--amber2:rgba(245,158,11,.12);
+  --green:#22c55e;--green2:rgba(34,197,94,.12);--blue:#3b82f6;--blue2:rgba(59,130,246,.12);
+  --text:#e8eaf0;--text2:#8892a4;--text3:#4a5568;
+  --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+  --radius:10px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font-family:var(--sans)}
+
+.layout{display:grid;grid-template-columns:210px 1fr;grid-template-rows:52px 1fr;min-height:100vh}
+
+/* Topbar */
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:-.3px}
+.logo-shield{width:30px;height:30px;background:var(--red);border-radius:7px;
+  display:flex;align-items:center;justify-content:center}
+.logo-shield svg{width:16px;height:16px;fill:white}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.live-pill{background:var(--green2);color:var(--green);font-size:11px;font-family:var(--mono);
+  padding:4px 12px;border-radius:20px;border:1px solid rgba(34,197,94,.25);display:flex;align-items:center;gap:6px}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.icon-btn{background:none;border:1px solid var(--border2);border-radius:8px;
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);position:relative;transition:background .15s}
+.icon-btn:hover{background:var(--bg3)}
+.notif-badge{position:absolute;top:6px;right:6px;width:6px;height:6px;
+  background:var(--red);border-radius:50%}
+.avatar{width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:white}
+
+/* Sidebar */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);
+  padding:16px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:10px;font-family:var(--mono);color:var(--text3);
+  padding:12px 10px 5px;letter-spacing:1px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+  cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all .15s;border:1px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--red2);color:var(--red);border-color:rgba(255,68,68,.2)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;fill:currentColor}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:10px;
+  font-family:var(--mono);padding:1px 6px;border-radius:5px;min-width:18px;text-align:center}
+.nav-divider{height:1px;background:var(--border);margin:8px 0}
+
+/* Main */
+.main{padding:24px;overflow-y:auto;background:var(--bg)}
+
+/* Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;
+  border-radius:50%;opacity:.06;transform:translate(15px,-15px)}
+.stat-card.red::before{background:var(--red)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:11px;font-family:var(--mono);color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.stat-value{font-size:30px;font-weight:700;line-height:1;margin-bottom:6px}
+.stat-card.red .stat-value{color:var(--red)}
+.stat-card.amber .stat-value{color:var(--amber)}
+.stat-card.green .stat-value{color:var(--green)}
+.stat-card.blue .stat-value{color:var(--blue)}
+.stat-change{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.stat-change .up{color:var(--green)}
+.stat-change .dn{color:var(--red)}
+
+/* Panel */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+.panel-head{padding:15px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.panel-body{padding:20px}
+
+/* Table */
+.etable{width:100%;border-collapse:collapse}
+.etable th{padding:10px 18px;text-align:left;font-size:10px;font-family:var(--mono);
+  color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:1px solid var(--border)}
+.etable td{padding:13px 18px;border-bottom:1px solid var(--border);font-size:13px;
+  color:var(--text2);vertical-align:middle}
+.etable tr:last-child td{border-bottom:none}
+.etable tbody tr{cursor:pointer;transition:background .1s}
+.etable tbody tr:hover{background:var(--bg3)}
+
+/* Tags */
+.tag{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:5px;font-weight:500;white-space:nowrap}
+.tag-phish{background:var(--red2);color:var(--red);border:1px solid rgba(255,68,68,.2)}
+.tag-susp{background:var(--amber2);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.tag-safe{background:var(--green2);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.tag-pend{background:var(--blue2);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+
+/* Risk bar */
+.risk-wrap{display:flex;align-items:center;gap:8px;min-width:90px}
+.risk-bar{flex:1;height:4px;background:var(--bg3);border-radius:2px}
+.risk-fill{height:100%;border-radius:2px}
+.risk-num{font-family:var(--mono);font-size:11px;min-width:30px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;
+  font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.btn-primary{background:var(--red);color:white}
+.btn-primary:hover{background:#e03030}
+.btn-outline{background:none;border:1px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+
+/* Form */
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-family:var(--mono);color:var(--text2);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--blue)}
+.form-textarea{resize:vertical;min-height:120px;line-height:1.6}
+
+/* Alerts */
+.alert-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.alert-dot.danger{background:var(--red)}
+.alert-dot.warning{background:var(--amber)}
+.alert-dot.info{background:var(--blue)}
+.alert-text{font-size:12px;line-height:1.5;color:var(--text2)}
+.alert-time{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Toast */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg2);border:1px solid rgba(255,68,68,.35);border-radius:12px;
+  padding:14px 16px;min-width:290px;max-width:340px;display:flex;gap:12px;
+  animation:toastIn .25s ease;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+@keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.toast-icon{width:30px;height:30px;background:var(--red);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast-icon svg{width:14px;height:14px;fill:white}
+.toast-body{flex:1}
+.toast-title{font-size:12px;font-weight:600;color:var(--red);margin-bottom:3px}
+.toast-msg{font-size:11px;color:var(--text2);line-height:1.5}
+.toast-close{color:var(--text3);cursor:pointer;font-size:18px;line-height:1;align-self:flex-start}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border)}
+.search-box{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;color:var(--text);font-size:13px;outline:none}
+.search-box:focus{border-color:var(--blue)}
+.search-box::placeholder{color:var(--text3)}
+.filter-tab{background:none;border:1px solid var(--border);border-radius:7px;
+  padding:6px 14px;font-size:12px;font-family:var(--mono);color:var(--text3);cursor:pointer;transition:all .15s}
+.filter-tab:hover,.filter-tab.active{background:var(--red2);color:var(--red);border-color:rgba(255,68,68,.25)}
+.filter-tab.safe.active{background:var(--green2);color:var(--green);border-color:rgba(34,197,94,.25)}
+.filter-tab.susp.active{background:var(--amber2);color:var(--amber);border-color:rgba(245,158,11,.25)}
+
+/* Messages */
+.messages{padding:0 24px;margin-bottom:-12px;margin-top:16px}
+.msg{padding:10px 16px;border-radius:8px;font-size:13px;margin-bottom:8px;border:1px solid}
+.msg-success{background:var(--green2);color:var(--green);border-color:rgba(34,197,94,.25)}
+.msg-error{background:var(--red2);color:var(--red);border-color:rgba(255,68,68,.25)}
+
+/* Grid helpers */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="layout">
+  <div class="topbar">
+    <a href="/" class="logo">
+      <div class="logo-shield">
+        <svg viewBox="0 0 16 16"><path d="M8 1L1 4v4c0 4 3 7 7 8 4-1 7-4 7-8V4L8 1zm0 2.2l4.5 2v3.5c0 2.6-2 4.6-4.5 5.3C5.5 12.3 3.5 10.3 3.5 7.7V5.2L8 3.2z"/><circle cx="8" cy="9" r="1.5"/><path d="M8 6v2" stroke="white" stroke-width="1.2" fill="none"/></svg>
+      </div>
+      PhishGuard AI
+    </a>
+    <div class="topbar-right">
+      <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+      <button class="icon-btn" id="notif-btn" title="Alerts">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a5 5 0 00-5 5v2.5L1.5 10v1h13v-1L13 8.5V6a5 5 0 00-5-5zm0 14a2 2 0 002-2H6a2 2 0 002 2z"/></svg>
+        <div class="notif-badge"></div>
+      </button>
+      <div class="avatar">OA</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="nav-section">Monitor</div>
+    <a href="/" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="/inbox/" class="nav-item {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}">
+      <svg viewBox="0 0 16 16"><path d="M1 3h14v10H1V3zm1 1v1.5l6 4 6-4V4H2zm0 3v5h12V7L8 11 2 7z"/></svg>
+      Inbox Scan
+      <span class="nav-badge" id="unread-count">—</span>
+    </a>
+    <a href="/scan/" class="nav-item {% if request.resolver_match.url_name == 'scan_email' %}active{% endif %}">
+      <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      Scan Email
+    </a>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Insights</div>
+    <a href="/analytics/" class="nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+      <svg viewBox="0 0 16 16"><rect x="1" y="8" width="3" height="7"/><rect x="6" y="4" width="3" height="11"/><rect x="11" y="1" width="3" height="14"/></svg>
+      Analytics
+    </a>
+    <div class="nav-divider"></div>
+    <div class="nav-section">System</div>
+    <a href="/settings/" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+      <svg viewBox="0 0 16 16"><path d="M6.5 1l-.8 1.6-1.7.4L2.8 4.3l.3 1.8-1.3 1.4.3 1.8 1.6.8.4 1.7 1.3 1.2 1.8-.3 1.4 1.3 1.8-.3.8-1.6 1.7-.4 1.2-1.3-.3-1.8 1.3-1.4-.3-1.8-1.6-.8-.4-1.7-1.3-1.2-1.8.3-1.4-1.3z"/><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor"/></svg>
+      Settings
+    </a>
+  </div>
+
+  <div class="main">
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+function showToast(title, msg, level='danger') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  if (level === 'warning') t.style.borderColor = 'rgba(245,158,11,.35)';
+  t.innerHTML = `
+    <div class="toast-icon" style="${level==='warning'?'background:var(--amber)':''}">
+      <svg viewBox="0 0 16 16"><path d="M8 1L1 5v5c0 4 3 6 7 6s7-2 7-6V5L8 1z"/></svg>
+    </div>
+    <div class="toast-body">
+      <div class="toast-title" style="${level==='warning'?'color:var(--amber)':''}">${title}</div>
+      <div class="toast-msg">${msg}</div>
+    </div>
+    <div class="toast-close" onclick="this.parentElement.remove()">×</div>`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 5000);
+}
+
+// Load unread count
+fetch('/api/stats/').then(r=>r.json()).then(d=>{
+  const el = document.getElementById('unread-count');
+  if (el) el.textContent = d.phishing || '0';
+}).catch(()=>{});
+
+document.getElementById('notif-btn').addEventListener('click', () => {
+  fetch('/api/recent-alerts/').then(r=>r.json()).then(d=>{
+    if (d.alerts && d.alerts.length) {
+      const a = d.alerts[0];
+      showToast('Recent Alert', a.message, a.level);
+    }
+  });
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
