@@ -1,0 +1,21 @@
+[build]
+  base = "phishguard/"
+  command = "python manage.py collectstatic --noinput && python manage.py migrate"
+  publish = "staticfiles/"
+
+[build.environment]
+  PYTHON_VERSION = "3.9"
+  DJANGO_SETTINGS_MODULE = "phishguard.settings_production"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  directory = "netlify/functions"

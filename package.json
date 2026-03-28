@@ -1,0 +1,12 @@
+{
+  "name": "phishguard-django",
+  "version": "1.0.0",
+  "description": "PhishGuard AI - Django deployment for Netlify",
+  "scripts": {
+    "build": "echo 'Building Django app for production...'",
+    "netlify:dev": "netlify dev"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
