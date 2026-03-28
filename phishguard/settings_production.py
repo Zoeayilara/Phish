@@ -50,6 +50,17 @@ try:
 except:
     pass
 
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
+    'detector',
+]
+
 # Environment variables
 ML_MODEL_PATH = BASE_DIR / 'ml' / 'phishguard_model.pkl'
 VECTORIZER_PATH = BASE_DIR / 'ml' / 'tfidf_vectorizer.pkl'
